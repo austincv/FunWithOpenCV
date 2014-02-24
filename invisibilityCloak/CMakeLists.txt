@@ -1,0 +1,5 @@
+cmake_minimum_required(VERSION 2.8)
+project( InvisibilityCloak )
+find_package( OpenCV REQUIRED )
+add_executable( invisibility invisibility.cpp )
+target_link_libraries( invisibility ${OpenCV_LIBS} )
