@@ -11,37 +11,44 @@ using namespace cv;
 
 void readme();
 int trackObj(Mat &, Mat &);
+static void onMouse(int event, int x, int y, int, void*);
+
+/* Global variables */
+
+Point mousePointer;
+Rect ROI = Rect(100,100,200,200);
 
 /** @function main */
 int main( int argc, char** argv )
 {
-  //if( argc != 3 )
-  //{ readme(); return -1; }
+   VideoCapture capture(0); // open the default camera
 
-   CvCapture* capture;
    Mat img_object;
    Mat img_scene;
 
-   //Read the video stream
-   capture = cvCaptureFromCAM( -1 );
    bool cloneObj = true;
-   if( capture )
+   if( capture.isOpened())
    {
-    Rect ROI = Rect(100,100,200,200);
+
      while( true )
      {
-	  //img_object = imread( argv[1], CV_LOAD_IMAGE_GRAYSCALE );
-	  //img_scene = imread( argv[2], CV_LOAD_IMAGE_GRAYSCALE );
-          img_scene = cvQueryFrame( capture );
+
+
+          capture >> img_scene; //get a new frame from camera
           cvtColor( img_scene, img_scene, CV_BGR2GRAY );
           
           if(cloneObj) { img_object = img_scene(ROI).clone(); }
-
+	
+	
 	  trackObj(img_object,img_scene);
-          //trackObj(img_scene,img_scene);
+
      if(waitKey(30) == 115) //wait for 's' key press for 30 ms. If 's' key is pressed, save images
 	{ cloneObj ? cloneObj = false : cloneObj = true; }
       }
+    }
+    else
+    {
+	readme();
     }
 
   waitKey(0);
@@ -140,4 +147,17 @@ int trackObj(Mat &img_object, Mat &img_scene)
 }
   /** @function readme */
   void readme()
-  { std::cout << " Usage: ./trackObject <img1> <img2>" << std::endl; }
+  { std::cout << " Connect WebCam and make sure it is working | Usage: ./trackObject " << std::endl; }
+
+  /** @function mouse click */
+
+//function for mouse 
+
+static void onMouse(int event, int x, int y, int, void*)
+{
+ if( event != EVENT_LBUTTONDOWN ) { return; }
+
+ mousePointer = Point(x,y);
+ return;
+}
+
