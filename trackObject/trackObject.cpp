@@ -15,8 +15,13 @@ static void onMouse(int event, int x, int y, int, void*);
 
 /* Global variables */
 
-Point mousePointer;
-Rect ROI = Rect(100,100,200,200);
+Mat frame;
+int ROI_width = 200;
+int ROI_height = 200;
+Rect ROI;
+int frameWidth;
+int frameHeight;
+bool snapObjectFrame = true;
 
 /** @function main */
 int main( int argc, char** argv )
@@ -26,24 +31,37 @@ int main( int argc, char** argv )
    Mat img_object;
    Mat img_scene;
 
-   bool cloneObj = true;
+
    if( capture.isOpened())
    {
 
+     //find the video size
+     frameWidth = (int) capture.get(CV_CAP_PROP_FRAME_WIDTH);
+     frameHeight = (int) capture.get(CV_CAP_PROP_FRAME_HEIGHT);
+     //initialze ROI to the middle of the frame
+     ROI = Rect(frameWidth/2 - ROI_width/2, frameHeight/2 - ROI_height/2 ,ROI_width,ROI_height);
+
+     //the infinite loop where we do all the tracking
      while( true )
      {
 
-
-          capture >> img_scene; //get a new frame from camera
-          cvtColor( img_scene, img_scene, CV_BGR2GRAY );
+          capture >> frame; //get a new frame from camera
+	  
+          cvtColor( frame, img_scene, CV_BGR2GRAY );
           
-          if(cloneObj) { img_object = img_scene(ROI).clone(); }
-	
-	
-	  trackObj(img_object,img_scene);
+          if(snapObjectFrame)
+	 {
+		img_object = img_scene(ROI).clone(); 
+		snapObjectFrame = false;
+	 }
 
-     if(waitKey(30) == 115) //wait for 's' key press for 30 ms. If 's' key is pressed, save images
-	{ cloneObj ? cloneObj = false : cloneObj = true; }
+	  trackObj(img_object,img_scene);
+          imshow("webcam", frame);
+	  //-- use mouse to select object to track
+	  setMouseCallback("webcam", onMouse, NULL);
+
+     if(waitKey(30) == 115) //wait for 's' key press for 30 ms. If 's' key is pressed, stop
+	break;
       }
     }
     else
@@ -142,8 +160,10 @@ int trackObj(Mat &img_object, Mat &img_scene)
 	  line( img_matches, scene_corners[2] + Point2f( img_object.cols, 0), scene_corners[3] + Point2f( img_object.cols, 0), Scalar( 0, 255, 0), 4 );
 	  line( img_matches, scene_corners[3] + Point2f( img_object.cols, 0), scene_corners[0] + Point2f( img_object.cols, 0), Scalar( 0, 255, 0), 4 );
  }
+
   //-- Show detected matches
-  imshow( "Good Matches & Object detection", img_matches );
+  imshow( "Object Tracking", img_matches );
+
 }
   /** @function readme */
   void readme()
@@ -157,7 +177,9 @@ static void onMouse(int event, int x, int y, int, void*)
 {
  if( event != EVENT_LBUTTONDOWN ) { return; }
 
- mousePointer = Point(x,y);
+   ROI = Rect(x - ROI_width/2, y - ROI_height/2 ,ROI_width,ROI_height);
+   snapObjectFrame = true;
+
  return;
 }
 
