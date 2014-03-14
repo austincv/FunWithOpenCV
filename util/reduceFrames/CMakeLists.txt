@@ -1,0 +1,5 @@
+cmake_minimum_required(VERSION 2.8)
+project( ReduceFrames )
+find_package( OpenCV REQUIRED )
+add_executable( reduceFrames reduceFrames.cpp )
+target_link_libraries( reduceFrames ${OpenCV_LIBS} )
