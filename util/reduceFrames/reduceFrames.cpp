@@ -32,7 +32,7 @@ int main(int argc, char* argv[])
     VideoWriter outputVideo; //open output
     //outputVideo.open("ROI4.mp4", ex=-1, cap.get(CV_CAP_PROP_FPS), S, true);
     //outputVideo.open(argv[2], CV_FOURCC('D', 'I', 'V', 'X'), inputVideo.get(CV_CAP_PROP_FPS), Size(1300,600), true);
-    outputVideo.open(argv[2], codec, outputFps, inputSize, true);
+    outputVideo.open(argv[2], CV_FOURCC('D', 'I', 'V', 'X'), outputFps, inputSize, true);
 
         if (!outputVideo.isOpened())
         {
