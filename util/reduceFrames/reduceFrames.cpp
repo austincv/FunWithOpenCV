@@ -8,10 +8,12 @@ using namespace std;
 int main(int argc, char* argv[])
 {
 
-    double outputFps = 1; //the frame rate of the output required
+    double outputFps; //the frame rate of the output required
     double inputFps;
     Size inputSize;
     int codec;
+    long unsigned int frameCount = 0;
+    int reduceFrame = 30; //reduce the number of frames by this number
 
     Mat src; //input frame
 
@@ -24,6 +26,7 @@ int main(int argc, char* argv[])
         }
 
     inputFps = inputVideo.get(CV_CAP_PROP_FPS); //get the frames per second of the video
+    outputFps = inputFps/reduceFrame;
     codec = static_cast<int>(inputVideo.get(CV_CAP_PROP_FOURCC));  // Get Codec Type- Int form
     inputSize = Size((int) inputVideo.get(CV_CAP_PROP_FRAME_WIDTH),    // Acquire input size
                   (int) inputVideo.get(CV_CAP_PROP_FRAME_HEIGHT));
@@ -32,7 +35,7 @@ int main(int argc, char* argv[])
     VideoWriter outputVideo; //open output
     //outputVideo.open("ROI4.mp4", ex=-1, cap.get(CV_CAP_PROP_FPS), S, true);
     //outputVideo.open(argv[2], CV_FOURCC('D', 'I', 'V', 'X'), inputVideo.get(CV_CAP_PROP_FPS), Size(1300,600), true);
-    outputVideo.open(argv[2], CV_FOURCC('D', 'I', 'V', 'X'), inputFps, inputSize, true);
+    outputVideo.open(argv[2], CV_FOURCC('D', 'I', 'V', 'X'), outputFps, inputSize, true);
 
         if (!outputVideo.isOpened())
         {
@@ -40,13 +43,18 @@ int main(int argc, char* argv[])
             return -1;
         }
 
+
     for(;;) //Show the image captured in the window and repeat
     {
+
         inputVideo >> src;              // read
         if (src.empty()) break;         // check if at end
-
+        cout<<"*";
        //outputVideo.write(res); //save or
-       outputVideo << src;
+        if ( frameCount % reduceFrame == 0)
+        { outputVideo << src; cout<<endl; }
+
+        frameCount++;
     }
 
     waitKey(0);
