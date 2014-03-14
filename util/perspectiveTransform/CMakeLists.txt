@@ -1,0 +1,5 @@
+cmake_minimum_required(VERSION 2.8)
+project( perspectiveTransform )
+find_package( OpenCV REQUIRED )
+add_executable( perspectiveTransform perspectiveTransform.cpp )
+target_link_libraries( perspectiveTransform ${OpenCV_LIBS} )
