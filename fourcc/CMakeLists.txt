@@ -1,0 +1,5 @@
+cmake_minimum_required(VERSION 2.8)
+project( trackObject )
+find_package( OpenCV REQUIRED )
+add_executable( getFourcc getFourcc.cpp )
+target_link_libraries( getFourcc ${OpenCV_LIBS} )
